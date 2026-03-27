@@ -78,6 +78,15 @@ This is the place for you to write reflections:
 
 #### Reflection Publisher-1
 
+1. Dalam konsep tradisional (seperti di buku Head First Design Patterns), Subscriber sering menggunakan interface agar Publisher bisa mengirim notifikasi ke berbagai class yang berbeda bentuknya asalkan mereka mengimplementasikan interface tersebut. Namun, pada kasus BambangShop, aplikasi menggunakan arsitektur web services di mana Subscriber adalah aplikasi Rocket terpisah. Publisher tidak perlu tahu bahasa pemrograman atau struktur internal Subscriber (Publisher hanya peduli pada URL endpoint (HTTP POST) tujuan). Oleh karena itu, penggunaan trait tidak diperlukan di sini. Sebuah Model struct tunggal yang menyimpan url dan name sudah lebih dari cukup karena kontrak atau interface nya terjadi di level HTTP API (melalui endpoint /receive), bukan di level kode Rust.
+
+
+2. Meskipun Vec bisa digunakan untuk menyimpan daftar, menggunakannya tidak efisien untuk kasus dengan atribut unik seperti id atau url. Jika kita menggunakan Vec, setiap operasi pencarian, penambahan (untuk mengecek duplikasi), atau penghapusan (unsubscribe) mengharuskan kita melakukan iterasi satu per satu ke seluruh elemen dalam list dengan kompleksitas waktu O(n). Sebaliknya, DashMap (yang merupakan varian dari HashMap) menggunakan url sebagai key. Hal ini memungkinkan operasi pencarian, penambahan, dan penghapusan dilakukan secara instan dengan kompleksitas rata-rata O(1). Oleh karena itu, penggunaan DashMap sangat krusial dan diperlukan untuk menjaga performa sistem tetap efisien.
+
+
+3. Singleton pattern bertujuan untuk memastikan bahwa hanya ada satu instance dari sebuah objek (misalnya, satu database SUBSCRIBERS untuk seluruh aplikasi). Namun, memiliki Singleton tidak secara otomatis membuat program menjadi thread-safe. Framework web seperti Rocket menggunakan banyak thread secara bersamaan (multithreading) untuk menangani request. Jika banyak thread mencoba membaca dan menulis ke HashMap biasa di dalam Singleton secara bersamaan, akan terjadi data race dan compiler Rust akan memblokirnya. Kita tetap membutuhkan DashMap karena pustaka ini dirancang khusus untuk concurrency, yaitu ia menyediakan mekanisme locking internal agar data aman diakses oleh banyak thread sekaligus.
+
+
 #### Reflection Publisher-2
 
 #### Reflection Publisher-3
