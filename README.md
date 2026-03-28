@@ -89,4 +89,22 @@ This is the place for you to write reflections:
 
 #### Reflection Publisher-2
 
+1. Memisahkan Service dan Repository dari Model pada dasarnya adalah penerapan prinsip Separation of Concerns (pemisahan tugas) dan Single Responsibility Principle. Kalau semua logika digabung di dalam Model (sering disebut Fat Model), kode akan menjadi sangat panjang, berantakan, dan sulit dipelihara. Dengan pemisahan ini, setiap bagian punya tugas yang spesifik:
+
+- Model hanya fokus mendefinisikan struktur data (struct).
+- Repository khusus mengurus interaksi langsung dengan penyimpanan data atau database (query, insert, delete).
+- Service bertindak sebagai otak aplikasi yang menangani business logic atau aturan-aturan utama.
+- Pemisahan ini membuat kode lebih modular. Misalnya, jika suatu saat kita ingin mengganti jenis database, kita hanya perlu mengubah kode di level Repository tanpa harus membongkar business logic yang ada di Service.
+
+
+2. Kalau kita memaksakan semua logic dan akses database ke dalam Model, kodenya akan berubah menjadi spaghetti code dengan tingkat coupling (ketergantungan) yang sangat tinggi. Bayangkan saja, Model Program harus mengandung fungsi untuk mencari daftar Subscriber di database, lalu Model yang sama juga harus merakit Notification untuk dikirimkan. Hal ini membuat Model kehilangan kemurniannya sebagai representasi data. Setiap kali ada perubahan kecil pada cara notifikasi dikirim, kita malah harus membongkar file Model Program. Jika dipisah menggunakan arsitektur Service-Repository, Model tetap bersih, sementara Service yang akan bertugas menjadi konduktor untuk mengatur kapan Program dibuat, kapan harus mengambil data Subscriber lewat Repository, dan kapan harus membuat Notification.
+
+
+3. Postman sangat membantu proses development karena memungkinkan kita untuk mengetes backend (API) secara langsung tanpa harus menunggu frontend nya dibuat. Kita bisa dengan mudah mensimulasikan berbagai macam HTTP request (POST, GET, DELETE) dan langsung melihat bentuk response nya dalam format JSON. Untuk pengerjaan proyek kelompok atau proyek software engineering ke depannya, beberapa fitur Postman yang sangat menarik dan helpful adalah:
+
+- Collections & Workspaces: Sangat berguna untuk kolaborasi tim karena kita bisa mendokumentasikan dan membagikan semua daftar endpoint API (beserta contoh request/response nya) ke anggota tim lain dengan mudah.
+- Environment Variables: Membantu kita untuk berganti environment dengan cepat (misalnya mengubah konfigurasi dari URL localhost untuk testing lokal ke URL production) tanpa perlu mengubah URL di setiap request satu per satu.
+- Automated Testing / Scripts: Memungkinkan kita untuk menulis script tes otomatis (biasanya menggunakan JavaScript) untuk memastikan response API yang kita buat selalu mengembalikan status dan format data yang sesuai ekspektasi.
+
+
 #### Reflection Publisher-3
