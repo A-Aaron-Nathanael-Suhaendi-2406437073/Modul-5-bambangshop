@@ -108,3 +108,16 @@ This is the place for you to write reflections:
 
 
 #### Reflection Publisher-3
+
+1. Di tutorial ini, kita menggunakan variasi Push model. Alasannya terlihat jelas pada fungsi notify di mana Publisher (aplikasi utama kita) secara aktif langsung mengirimkan (push) payload data notifikasi secara lengkap ke URL masing2 Subscriber lewat HTTP POST request segera setelah suatu event terjadi (seperti penambahan produk, promosi, atau penghapusan). Subscriber di sini sifatnya pasif dan hanya menunggu disuapi / dikirim data oleh Publisher.
+
+
+2. Jika kita menggunakan Pull model, di mana Subscriber yang harus proaktif menarik (request) data terbaru dari Publisher:
+
+Kelebihan: Publisher kerjanya jauh lebih ringan karena tidak perlu mengirimkan request satu per satu ke banyak URL subscriber. Beban kontrol berpindah ke Subscriber. Selain itu, Subscriber bisa mengatur sendiri kapan mereka siap dan ingin mengambil data, sehingga server mereka tidak akan overload kalau tiba-tiba ada banyak produk baru sekaligus.
+
+Kekurangan: Notifikasi menjadi tidak real-time karena Subscriber baru tahu ada pembaruan saat mereka mengeceknya. Selain itu, kalau Subscriber terus-terusan mengecek (polling secara berkala) ke Publisher padahal tidak ada produk baru, hal itu hanya akan membuang-buang bandwidth jaringan dan membebani server Publisher dengan request yang sia-sia.
+
+
+3. Jika kita tidak menggunakan multi-threading (yaitu dengan menghapus bagian thread::spawn), proses iterasi untuk mengirim notifikasi akan berjalan secara synchronous dan berurutan. Artinya, program harus menunggu pengiriman HTTP POST ke Subscriber pertama selesai (dan mendapatkan balasan/berhasil), barulah bisa lanjut mengirim ke Subscriber kedua, dan seterusnya.
+Akibat fatalnya adalah proses utama (misalnya saat owner membuat produk baru) akan mengalami blocking atau tertahan sangat lama. Kalau ada ratusan subscriber atau jika server subscriber sedang lambat merespons, owner yang menekan tombol create product akan melihat sistem loading terus-menerus sebelum akhirnya mendapatkan status 201 Created. Dengan multi-threading, tugas mengirim notifikasi dilempar ke belakang layar untuk dikerjakan secara paralel, sehingga response pembuatan produk bisa langsung dikembalikan dengan cepat tanpa harus menunggu semua notifikasi terkirim.
